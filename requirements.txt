@@ -1,0 +1,9 @@
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting RPi.GPIO
+  Downloading RPi.GPIO-0.7.1.tar.gz (29 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Installing collected packages: RPi.GPIO
+  Running setup.py install for RPi.GPIO: started
+  Running setup.py install for RPi.GPIO: finished with status 'done'
+Successfully installed RPi.GPIO-0.7.1
