@@ -19,8 +19,11 @@ class EightSleep:
             raise ValueError("EIGHTSLEEP_USERNAME and EIGHTSLEEP_PASSWORD environment variables must be set.")
 
         self.access_token = None
-        self._login()
-        self.user_id = self._get_user_id()
+        try:
+            self._login()
+            self.user_id = self._get_user_id()
+        except:
+            print("Failed to login to Eight Sleep")
         self.is_pod_on = False
         print("Eight Sleep client initialized successfully.")
 

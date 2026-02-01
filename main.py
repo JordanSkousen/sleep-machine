@@ -1,6 +1,6 @@
 import subprocess
 import RPi.GPIO as GPIO
-import datetime
+from datetime import datetime, timedelta
 import time
 import threading
 from eightsleep import EightSleep
@@ -51,10 +51,10 @@ alarm_presets = [
     [10, 0], # Sat
     [8, 30], # Sun
 ]
-dow = datetime.datetime.now().weekday()
+dow = datetime.now().weekday()
 alarm_hour = alarm_presets[dow][0]
 alarm_minute = alarm_presets[dow][1]
-last_interaction = datetime.datetime.now()
+last_interaction = datetime.now()
 
 # --- Configuration ---
 SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
@@ -72,7 +72,7 @@ def handle_clicks():
 
     if click_count == 1:
         # Single click action
-        if last_interaction > datetime.datetime.now() + datetime.timedelta(minutes=5):
+        if last_interaction > datetime.now() + timedelta(minutes=5):
             # Announce ready state instead of toggling backwards mode
             announce_ready_state()
         else:
@@ -93,11 +93,14 @@ def handle_clicks():
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
             backwards_mode = False
-            alarm_hour = datetime.datetime.now().hour # For debugging
-            alarm_minute = datetime.datetime.now().minute + 1 # For debugging
+            alarm_hour = datetime.now().hour # For debugging
+            alarm_minute = datetime.now().minute + 1 # For debugging
             if not eight_sleep.is_pod_on:
-                eight_sleep.set_pod_state(True)
-                eight_sleep.set_temperature(POD_TEMP)
+                try:
+                    eight_sleep.set_pod_state(True)
+                    eight_sleep.set_temperature(POD_TEMP)
+                except:
+                    print("Failed to turn on pod")
 
     click_count = 0
 
@@ -106,8 +109,8 @@ def announce_ready_state():
     play_file_sync(f"{SOUND_PATH}tts/ready.mp3")
     play_file_sync(f"{SOUND_PATH}tts/{alarm_hour}{alarm_minute}.mp3")
     play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/int/{datetime.datetime.now().hour}.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/int/{datetime.datetime.now().minute}.mp3")
+    play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().hour}.mp3")
+    play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().minute}.mp3")
 
 announce_ready_state()
 
@@ -115,7 +118,7 @@ try:
     while True:
         clk_state = GPIO.input(CLK_PIN)
         button_state = GPIO.input(SW_PIN)
-        now = datetime.datetime.now()
+        now = datetime.now()
 
         # Reset the alarm lock at 9:00 PM (21:00)
         if alarm_has_gone_off_today and now.hour >= 21:
@@ -123,8 +126,12 @@ try:
             print("Alarm lock removed. White noise can be played.")
 
         if not eight_sleep.is_pod_on and now.hour >= 11:
-            eight_sleep.set_pod_state(True)
-            eight_sleep.set_temperature(POD_TEMP)
+            try:
+                eight_sleep.set_pod_state(True)
+                eight_sleep.set_temperature(POD_TEMP)
+            except:
+                print("Failed to turn on pod")
+            
 
         # --- Alarm Trigger Logic ---
         if (not alarm_mode and white_noise_playing and now.hour == alarm_hour and now.minute == alarm_minute):
@@ -136,12 +143,12 @@ try:
         # --- Potentiometer Logic ---
         if not white_noise_playing and clk_state != clk_last_state and clk_state == 1:
             last_interaction = now
-            alarm_time = datetime.datetime.now().replace(hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
+            alarm_time = datetime.now().replace(hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
             if alarm_time.hour >= 4 and alarm_time.hour <= 12:
                 if backwards_mode:
-                    alarm_time -= datetime.timedelta(minutes=15)
+                    alarm_time -= timedelta(minutes=15)
                 else:
-                    alarm_time += datetime.timedelta(minutes=15)
+                    alarm_time += timedelta(minutes=15)
 
             alarm_hour = alarm_time.hour
             alarm_minute = alarm_time.minute
@@ -166,14 +173,20 @@ try:
                     threading.Thread(target=play_file, args=(f"{SOUND_PATH}tts/gmorn.mp3",)).start()
                 alarm_mode = False
                 white_noise_playing = False
-                eight_sleep.set_pod_state(False)
+                try:
+                    eight_sleep.set_pod_state(False)
+                except:
+                    print("Failed to turn off pod")
 
             elif white_noise_playing:
                 click_count = 0
                 print("Stopping white noise")
                 stop_playback()
                 white_noise_playing = False
-                eight_sleep.set_pod_state(False)
+                try:
+                    eight_sleep.set_pod_state(False)
+                except:
+                    print("Failed to turn off pod")
             else:
                 click_count += 1
                 click_timer = threading.Timer(0.3, handle_clicks)

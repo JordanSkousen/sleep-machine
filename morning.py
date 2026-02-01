@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import random
 from google import genai
 from google.genai import types
@@ -39,7 +39,7 @@ def get_morning_announcement(location):
     fun_fact = pick_random_funfact()
     conditions, high = get_weather(location)
     if conditions and high:
-        today = datetime.datetime.now().strftime("%B %d, %Y")
+        today = datetime.now().strftime("%B %d, %Y")
         prompt = f"You are a easy-going, silly weather man reporting today's forecast. Today's forecast for {location} is {conditions} with a high of {high} degrees Fahrenheit. Today's date is {today}. Give the weather report for today. Keep it under 100 words." if conditions and high else "Tell me a random fun fact."
 
         print("Generating morning announcement...")
