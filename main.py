@@ -16,6 +16,7 @@ def play_file(file, repeat=False):
         ["cvlc", "--repeat", f"file://{file}"] if repeat else ["cvlc", f"file://{file}"])
     
 def play_file_sync(file):
+    print(f"Playing {file}")
     subprocess.run(["cvlc", "--play-and-exit", f"file://{file}"])
 
 def stop_playback():
@@ -51,7 +52,7 @@ alarm_presets = [
     [10, 0], # Sat
     [8, 30], # Sun
 ]
-dow = datetime.now().weekday()
+dow = (datetime.now() - timedelta(hours = 3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
 alarm_hour = alarm_presets[dow][0]
 alarm_minute = alarm_presets[dow][1]
 last_interaction = datetime.now()
