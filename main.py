@@ -94,8 +94,8 @@ def handle_clicks():
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
             backwards_mode = False
-            alarm_hour = datetime.now().hour # For debugging
-            alarm_minute = datetime.now().minute + 1 # For debugging
+            # alarm_hour = datetime.now().hour # For debugging
+            # alarm_minute = datetime.now().minute + 1 # For debugging
             if not eight_sleep.is_pod_on:
                 try:
                     eight_sleep.set_pod_state(True)
