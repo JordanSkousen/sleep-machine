@@ -9,8 +9,7 @@ from morning import generate_morning_announcement
 cvlc_process = None
 def play_file(file, repeat=False):
     global cvlc_process
-    if cvlc_process:
-        cvlc_process.kill()
+    stop_playback()
     print(f"Playing {file}")
     cvlc_process = subprocess.Popen(
         ["cvlc", "--repeat", f"file://{file}"] if repeat else ["cvlc", f"file://{file}"])
@@ -52,29 +51,28 @@ alarm_presets = [
     [10, 0], # Sat
     [8, 30], # Sun
 ]
-dow = (datetime.now() - timedelta(hours=3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
-alarm_time = (datetime.now().replace(hour=alarm_presets[dow][0], minute=alarm_presets[dow][1], second=0, microsecond=0) + timedelta(days=1))
+alarm_time = datetime.now()
 last_interaction = datetime.now()
+eight_sleep = EightSleep()
 
 # --- Configuration ---
 SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
 WHITE_NOISE_FILE = "Aircraft Lavatory.mp3"
 ALARM_FILE = "alarm.mp3"
 POD_TEMP = -45
-eight_sleep = EightSleep()
 
 subprocess.run(["bluetoothctl", "connect", speaker_mac])
 time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
 print("ready")
 
 def handle_clicks():
-    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, announce_ready_state, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
+    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_ready_state, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
 
     if click_count == 1:
         # Single click action
         if last_interaction > datetime.now() + timedelta(minutes=5):
             # Announce ready state instead of toggling backwards mode
-            announce_ready_state()
+            set_default_alarm_and_announce_ready_state()
         else:
             # Toggle backwards mode
             backwards_mode = not backwards_mode
@@ -104,14 +102,18 @@ def handle_clicks():
     click_count = 0
 
 
-def announce_ready_state():
+def set_default_alarm_and_announce_ready_state():
+    global alarm_time, alarm_presets
+    now = datetime.now()
+    dow = (now - timedelta(hours=3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
+    alarm_time = (now.replace(hour=alarm_presets[dow][0], minute=alarm_presets[dow][1], second=0, microsecond=0) + timedelta(days=1))
     play_file_sync(f"{SOUND_PATH}tts/ready.mp3")
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
     play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().hour}.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().minute}.mp3")
+    play_file_sync(f"{SOUND_PATH}tts/int/{now.hour}.mp3")
+    play_file_sync(f"{SOUND_PATH}tts/int/{now.minute}.mp3")
 
-announce_ready_state()
+set_default_alarm_and_announce_ready_state()
 
 try:
     while True:
@@ -130,7 +132,6 @@ try:
                 eight_sleep.set_temperature(POD_TEMP)
             except:
                 print("Failed to turn on pod")
-            
 
         # --- Alarm Trigger Logic ---
         if (not alarm_mode and white_noise_playing and now >= alarm_time):
@@ -159,6 +160,8 @@ try:
                 click_timer.cancel()
             if alarm_mode:
                 click_count = 0
+                alarm_mode = False
+                white_noise_playing = False
                 print("Stopping alarm")
                 stop_playback()
                 morning_file = "/tmp/morning.mp3"
@@ -166,8 +169,6 @@ try:
                     threading.Thread(target=play_file, args=(morning_file,)).start()
                 else:
                     threading.Thread(target=play_file, args=(f"{SOUND_PATH}tts/gmorn.mp3",)).start()
-                alarm_mode = False
-                white_noise_playing = False
                 try:
                     eight_sleep.set_pod_state(False)
                 except:
@@ -196,7 +197,6 @@ except KeyboardInterrupt:
 finally:
     if click_timer is not None:
         click_timer.cancel()
-    if cvlc_process is not None:
-        cvlc_process.kill()
+    stop_playback()
     subprocess.run(["bluetoothctl", "disconnect", speaker_mac])
     GPIO.cleanup()
