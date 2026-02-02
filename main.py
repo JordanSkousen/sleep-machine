@@ -52,14 +52,13 @@ alarm_presets = [
     [10, 0], # Sat
     [8, 30], # Sun
 ]
-dow = (datetime.now() - timedelta(hours = 3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
-alarm_hour = alarm_presets[dow][0]
-alarm_minute = alarm_presets[dow][1]
+dow = (datetime.now() - timedelta(hours=3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
+alarm_time = (datetime.now().replace(hour=alarm_presets[dow][0], minute=alarm_presets[dow][1], second=0, microsecond=0) + timedelta(days=1))
 last_interaction = datetime.now()
 
 # --- Configuration ---
 SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
-WHITE_NOISE_FILE = "Aircraft Lavatory extended.mp3"
+WHITE_NOISE_FILE = "Aircraft Lavatory.mp3"
 ALARM_FILE = "alarm.mp3"
 POD_TEMP = -45
 eight_sleep = EightSleep()
@@ -69,7 +68,7 @@ time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs afte
 print("ready")
 
 def handle_clicks():
-    global click_count, white_noise_playing, backwards_mode, alarm_hour, alarm_minute, eight_sleep, last_interaction, announce_ready_state, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
+    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, announce_ready_state, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
 
     if click_count == 1:
         # Single click action
@@ -94,8 +93,7 @@ def handle_clicks():
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
             backwards_mode = False
-            # alarm_hour = datetime.now().hour # For debugging
-            # alarm_minute = datetime.now().minute + 1 # For debugging
+            #alarm_time = alarm_time.replace(day=datetime.now().day, hour=datetime.now().hour, minute=datetime.now().minute + 1) # For debugging
             if not eight_sleep.is_pod_on:
                 try:
                     eight_sleep.set_pod_state(True)
@@ -108,7 +106,7 @@ def handle_clicks():
 
 def announce_ready_state():
     play_file_sync(f"{SOUND_PATH}tts/ready.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/{alarm_hour}{alarm_minute}.mp3")
+    play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
     play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
     play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().hour}.mp3")
     play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().minute}.mp3")
@@ -135,7 +133,7 @@ try:
             
 
         # --- Alarm Trigger Logic ---
-        if (not alarm_mode and white_noise_playing and now.hour == alarm_hour and now.minute == alarm_minute):
+        if (not alarm_mode and white_noise_playing and now >= alarm_time):
             print("Alarm triggered")
             play_file(f"{SOUND_PATH}{ALARM_FILE}")
             alarm_mode = True
@@ -144,18 +142,14 @@ try:
         # --- Potentiometer Logic ---
         if not white_noise_playing and clk_state != clk_last_state and clk_state == 1:
             last_interaction = now
-            alarm_time = datetime.now().replace(hour=alarm_hour, minute=alarm_minute, second=0, microsecond=0)
             if alarm_time.hour >= 4 and alarm_time.hour <= 12:
                 if backwards_mode:
                     alarm_time -= timedelta(minutes=15)
                 else:
                     alarm_time += timedelta(minutes=15)
 
-            alarm_hour = alarm_time.hour
-            alarm_minute = alarm_time.minute
-
-            announcement = f"Alarm set to {alarm_hour:02d}:{alarm_minute:02d}"
-            announcement_file = f"{SOUND_PATH}tts/{alarm_hour}{alarm_minute}.mp3"
+            announcement = f"Alarm set to {alarm_time.strftime("%H:%M")}"
+            announcement_file = f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3"
             threading.Thread(target=play_file, args=(announcement_file,)).start()
 
         # --- Button Logic ---
