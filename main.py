@@ -35,7 +35,6 @@ GPIO.setup(SW_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 clk_last_state = GPIO.input(CLK_PIN)
 button_last_state = GPIO.input(SW_PIN)
 white_noise_playing = False
-speaker_mac = "F8:0F:F9:BF:9C:E0"
 alarm_mode = False
 backwards_mode = False
 click_timer = None
@@ -60,19 +59,20 @@ SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
 WHITE_NOISE_FILE = "Aircraft Lavatory.mp3"
 ALARM_FILE = "alarm.mp3"
 POD_TEMP = -45
+SPEAKER_MAC = "F8:0F:F9:BF:9C:E0"
 
-subprocess.run(["bluetoothctl", "connect", speaker_mac])
+subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
 time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
 print("ready")
 
 def handle_clicks():
-    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_ready_state, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
+    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_ready, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
 
     if click_count == 1:
         # Single click action
         if last_interaction > datetime.now() + timedelta(minutes=5):
             # Announce ready state instead of toggling backwards mode
-            set_default_alarm_and_announce_ready_state()
+            set_default_alarm_and_announce_ready()
         else:
             # Toggle backwards mode
             backwards_mode = not backwards_mode
@@ -102,18 +102,21 @@ def handle_clicks():
     click_count = 0
 
 
-def set_default_alarm_and_announce_ready_state():
+def set_default_alarm_and_announce_ready():
     global alarm_time, alarm_presets
     now = datetime.now()
     dow = (now - timedelta(hours=3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
-    alarm_time = (now.replace(hour=alarm_presets[dow][0], minute=alarm_presets[dow][1], second=0, microsecond=0) + timedelta(days=1))
+    alarm_time = now.replace(hour=alarm_presets[dow][0], minute=alarm_presets[dow][1], second=0, microsecond=0)
+    if alarm_time < now: # if current time is before midnight, we need move alarm time to tomorrow
+        alarm_time = alarm_time + timedelta(days=1)
     play_file_sync(f"{SOUND_PATH}tts/ready.mp3")
+    print(f"Set alarm time: {alarm_time}")
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/int/{now.hour}.mp3")
-    play_file_sync(f"{SOUND_PATH}tts/int/{now.minute}.mp3")
 
-set_default_alarm_and_announce_ready_state()
+set_default_alarm_and_announce_ready()
+play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
+play_file_sync(f"{SOUND_PATH}tts/int/{now.hour}.mp3")
+play_file_sync(f"{SOUND_PATH}tts/int/{now.minute}.mp3")
 
 try:
     while True:
@@ -198,5 +201,5 @@ finally:
     if click_timer is not None:
         click_timer.cancel()
     stop_playback()
-    subprocess.run(["bluetoothctl", "disconnect", speaker_mac])
+    subprocess.run(["bluetoothctl", "disconnect", SPEAKER_MAC])
     GPIO.cleanup()
