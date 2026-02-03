@@ -115,8 +115,8 @@ def set_default_alarm_and_announce_ready():
 
 set_default_alarm_and_announce_ready()
 play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
-play_file_sync(f"{SOUND_PATH}tts/int/{now.hour}.mp3")
-play_file_sync(f"{SOUND_PATH}tts/int/{now.minute}.mp3")
+play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().hour}.mp3")
+play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().minute}.mp3")
 
 try:
     while True:
