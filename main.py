@@ -3,6 +3,7 @@ import RPi.GPIO as GPIO
 from datetime import datetime, timedelta
 import time
 import threading
+import os
 from eightsleep import EightSleep
 from morning import generate_morning_announcement
 
@@ -40,7 +41,6 @@ backwards_mode = False
 click_timer = None
 click_count = 0
 alarm_announced = False
-alarm_has_gone_off_today = False
 alarm_presets = [
     [8, 30], # Mon
     [8, 30], # Tue
@@ -56,21 +56,51 @@ eight_sleep = EightSleep()
 
 # --- Configuration ---
 SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
-WHITE_NOISE_FILE = "Aircraft Lavatory.mp3"
+WHITE_NOISE_FILE = "Aircraft Lavatory medium extended.mp3"
 ALARM_FILE = "alarm.mp3"
 POD_TEMP = -45
 SPEAKER_MAC = "F8:0F:F9:BF:9C:E0"
+LAST_ALARM_FILE = "last_alarm.txt"
 
-subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
-time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
-print("ready")
+def get_last_alarm_time():
+    if not os.path.exists(LAST_ALARM_FILE):
+        return None
+    with open(LAST_ALARM_FILE, "r") as f:
+        content = f.read().strip()
+        if content:
+            try:
+                return datetime.fromisoformat(content)
+            except ValueError:
+                return None
+    return None
+
+def write_last_alarm_time():
+    with open(LAST_ALARM_FILE, "w") as f:
+        f.write(datetime.now().isoformat())
+
+def alarm_lock_is_active():
+    last_alarm = get_last_alarm_time()
+    if not last_alarm:
+        return False
+    
+    now = datetime.now()
+    # If alarm was on a previous day, lock is off
+    if now.date() > last_alarm.date():
+        return False
+    
+    # If alarm was today, lock is active until 9pm
+    if now.hour >= 21:
+        return False # Lock is lifted at 9pm
+    
+    return True # Lock is active
 
 def handle_clicks():
-    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_ready, play_file, alarm_has_gone_off_today, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
+    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_ready, play_file, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
 
+    now = datetime.now()
     if click_count == 1:
         # Single click action
-        if last_interaction > datetime.now() + timedelta(minutes=5):
+        if last_interaction > now + timedelta(minutes=5):
             # Announce ready state instead of toggling backwards mode
             set_default_alarm_and_announce_ready()
         else:
@@ -83,7 +113,7 @@ def handle_clicks():
 
     elif click_count == 2:
         # Double click action
-        if alarm_has_gone_off_today: # Check the lock
+        if alarm_lock_is_active(): # Check the lock
             print("Cannot play white noise, alarm has already gone off today.")
             threading.Thread(target=play_file, args=(f"{SOUND_PATH}tts/notallowed.mp3",)).start()
         else:
@@ -91,7 +121,9 @@ def handle_clicks():
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
             backwards_mode = False
-            #alarm_time = alarm_time.replace(day=datetime.now().day, hour=datetime.now().hour, minute=datetime.now().minute + 1) # For debugging
+            #alarm_time = alarm_time.replace(day=now.day, hour=now.hour, minute=now.minute + 1) # For debugging
+            if alarm_time < now: # if current time is before midnight, we'll need move alarm time to tomorrow
+                alarm_time = alarm_time + timedelta(days=1)
             if not eight_sleep.is_pod_on:
                 try:
                     eight_sleep.set_pod_state(True)
@@ -105,15 +137,17 @@ def handle_clicks():
 def set_default_alarm_and_announce_ready():
     global alarm_time, alarm_presets
     now = datetime.now()
-    dow = (now - timedelta(hours=3)).weekday() # Subtract 3 from the current time so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
+    dow = (now - timedelta(hours=3)).weekday() # When calculating the day of week, subtract 3 from the current hour so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
     alarm_time = now.replace(hour=alarm_presets[dow][0], minute=alarm_presets[dow][1], second=0, microsecond=0)
-    if alarm_time < now: # if current time is before midnight, we need move alarm time to tomorrow
-        alarm_time = alarm_time + timedelta(days=1)
     play_file_sync(f"{SOUND_PATH}tts/ready.mp3")
     print(f"Set alarm time: {alarm_time}")
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
 
+subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
+time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
+print("ready")
 set_default_alarm_and_announce_ready()
+# announce the current time on start up, so if the system time is wrong the user knows
 play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
 play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().hour}.mp3")
 play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().minute}.mp3")
@@ -123,11 +157,6 @@ try:
         clk_state = GPIO.input(CLK_PIN)
         button_state = GPIO.input(SW_PIN)
         now = datetime.now()
-
-        # Reset the alarm lock at 9:00 PM (21:00)
-        if alarm_has_gone_off_today and now.hour >= 21:
-            alarm_has_gone_off_today = False
-            print("Alarm lock removed. White noise can be played.")
 
         if not eight_sleep.is_pod_on and now.hour >= 11:
             try:
@@ -141,7 +170,7 @@ try:
             print("Alarm triggered")
             play_file(f"{SOUND_PATH}{ALARM_FILE}")
             alarm_mode = True
-            alarm_has_gone_off_today = True # Set the lock
+            write_last_alarm_time() # Set the lock
 
         # --- Potentiometer Logic ---
         if not white_noise_playing and clk_state != clk_last_state and clk_state == 1:
