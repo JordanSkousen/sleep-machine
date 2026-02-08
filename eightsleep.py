@@ -23,9 +23,9 @@ class EightSleep:
             self._login()
             self.user_id = self._get_user_id()
         except:
-            print("Failed to login to Eight Sleep")
+            print("Failed to login to Eight Sleep", flush=True)
         self.is_pod_on = False
-        print("Eight Sleep client initialized successfully.")
+        print("Eight Sleep client initialized successfully.", flush=True)
 
     def _get_headers(self) -> dict:
         """
@@ -53,7 +53,7 @@ class EightSleep:
         """
         Logs into the Eight Sleep API to retrieve an access token.
         """
-        print("Logging in to Eight Sleep...")
+        print("Logging in to Eight Sleep...", flush=True)
         url = "https://auth-api.8slp.net/v1/tokens"
         headers = self._get_headers()
         data = {
@@ -71,7 +71,7 @@ class EightSleep:
         if not self.access_token:
             raise ValueError("Failed to retrieve access_token from login response.")
         
-        print("Login successful.")
+        print("Login successful.", flush=True)
         self.token_expiry = datetime.datetime.now()
         self.token_expiry += datetime.timedelta(seconds = response.json().get("expires_in"))
 
@@ -79,7 +79,7 @@ class EightSleep:
         """
         Retrieves the user's ID from the Eight Sleep API.
         """
-        print("Fetching user ID...")
+        print("Fetching user ID...", flush=True)
         url = "https://client-api.8slp.net/v1/users/me"
         headers = self._get_headers()
         
@@ -90,7 +90,7 @@ class EightSleep:
         if not user_id:
             raise ValueError("Failed to retrieve user_id from user data.")
         
-        print(f"User ID found: {user_id}")
+        print(f"User ID found: {user_id}", flush=True)
         return user_id
     
     def _check_login_needed(self):
@@ -101,7 +101,7 @@ class EightSleep:
         """
         Sends a command to turn on the pod.
         """
-        print("Sending command to turn ON the pod..." if on else "Sending command to turn OFF the pod...")
+        print("Sending command to turn ON the pod..." if on else "Sending command to turn OFF the pod...", flush=True)
         self._check_login_needed()
         url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
         headers = self._get_headers()
@@ -114,7 +114,7 @@ class EightSleep:
         response.raise_for_status()
         
         self.is_pod_on = on
-        print("Pod 'turn on' command sent successfully." if on else "Pod 'turn off' command sent successfully.")
+        print("Pod 'turn on' command sent successfully." if on else "Pod 'turn off' command sent successfully.", flush=True)
         return response.json()
 
     def set_temperature(self, level: int = 0):
@@ -124,7 +124,7 @@ class EightSleep:
         Args:
             level (int): The temperature level for the pod (-100 to 100).
         """
-        print(f"Sending command to set temperature to {level}...")
+        print(f"Sending command to set temperature to {level}...", flush=True)
         self._check_login_needed()
         url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
         headers = self._get_headers()
@@ -134,7 +134,7 @@ class EightSleep:
         })
         response.raise_for_status()
         
-        print("Pod temperature set successfully.")
+        print("Pod temperature set successfully.", flush=True)
         return response.json()
 
 

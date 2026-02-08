@@ -19,7 +19,7 @@ HEADERS = {
 }
 
 def tts(text: str, output_filename: str = "output.mp3") -> bool:
-    print(f"Converting \"{text}\" to mp3...")
+    print(f"Converting \"{text}\" to mp3...", flush=True)
 
     data = {
         "text": text,
@@ -42,15 +42,15 @@ def tts(text: str, output_filename: str = "output.mp3") -> bool:
 
             with open(output_filename, 'wb') as f:
                 f.write(response.content)
-            print(f"Success: Audio content written to '{output_filename}'")
+            print(f"Success: Audio content written to '{output_filename}'", flush=True)
             return True
         else:
-            print(f"Error from ElevenLabs API: {response.status_code}")
-            print(f"Response: {response.text}")
+            print(f"Error from ElevenLabs API: {response.status_code}", flush=True)
+            print(f"Response: {response.text}", flush=True)
             return False
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred during the API request: {e}")
+        print(f"An error occurred during the API request: {e}", flush=True)
         return False
 
 if __name__ == '__main__':

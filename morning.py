@@ -10,7 +10,7 @@ def get_weather(location):
     """
     Fetches weather from wttr.in
     """
-    print(f"Getting weather...")
+    print(f"Getting weather...", flush=True)
     try:
         response = requests.get(f"https://wttr.in/{location}?format=j1")
         response.raise_for_status()  # Raise an exception for bad status codes
@@ -20,7 +20,7 @@ def get_weather(location):
         high_temp_f = today_forecast['maxtempF']
         return conditions, high_temp_f
     except requests.exceptions.RequestException as e:
-        print(f"Could not retrieve weather: {e}")
+        print(f"Could not retrieve weather: {e}", flush=True)
         return None, None
     
 def pick_random_funfact():
@@ -42,7 +42,7 @@ def get_morning_announcement(location):
         today = datetime.now().strftime("%B %d, %Y")
         prompt = f"You are a easy-going, silly weather man reporting today's forecast. Today's forecast for {location} is {conditions} with a high of {high} degrees Fahrenheit. Today's date is {today}. Give the weather report for today. Keep it under 100 words." if conditions and high else "Tell me a random fun fact."
 
-        print("Generating morning announcement...")
+        print("Generating morning announcement...", flush=True)
         try:
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
@@ -50,11 +50,11 @@ def get_morning_announcement(location):
             )
             # I tried including asking for a fun fact in the gemini prompt, but it kept giving me the same fun fact "A group of owls is called a parliament" lol
             announcement_text = f"{response.text}\nAnd finally, here's a random fun fact for the day: {fun_fact}"
-            print("Announcement text generated:")
-            print(announcement_text)
+            print("Announcement text generated:", flush=True)
+            print(announcement_text, flush=True)
             return announcement_text
         except Exception as e:
-            print(f"An error occurred during content generation: {e}")
+            print(f"An error occurred during content generation: {e}", flush=True)
             return fun_fact
         finally:
             client.close()
