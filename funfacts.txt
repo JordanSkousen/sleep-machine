@@ -16,7 +16,7 @@ Seahorses are monogamous and travel in pairs holding tails.
 Sharks have been around longer than trees.
 Reindeer eyeballs turn blue in winter to help them see in low light.
 A domestic cat’s genome is 95.6% tiger.
-Food & DrinkHoney never spoils; archaeologists have found edible honey in ancient Egyptian tombs.
+Honey never spoils; archaeologists have found edible honey in ancient Egyptian tombs.
 Ripe cranberries will bounce like rubber balls.
 McDonald’s once created bubblegum-flavored broccoli.
 Peanuts aren't technically nuts; they are legumes.
@@ -36,7 +36,7 @@ The first food eaten in space by an American was applesauce.
 Chickens outnumber humans on Earth three to one.
 Apples float because 25% of their volume is air.
 Pistachios are actually seeds.
-Space & ScienceOne day on Venus is longer than one year on Venus.
+One day on Venus is longer than one year on Venus.
 There are more trees on Earth than stars in the Milky Way.
 Liquid water can boil and freeze at the same time (called the "triple point").
 Saturn’s rings are mostly made of ice and dust.
@@ -51,13 +51,12 @@ Hot water freezes faster than cold water (the Mpemba effect).
 You can't burp in space because gravity doesn't separate liquids from gas in your stomach.
 Helium can defy gravity and climb up the walls of a container when cooled to near absolute zero.
 There is a planet made of diamonds (55 Cancri e).
-The Moon is moving away from Earth at about 1.
-5 inches per year.
+The Moon is moving away from Earth at about 1.5 inches per year.
 Light takes 8 minutes and 20 seconds to travel from the Sun to Earth.
 Neutron stars can spin 600 times per second.
 Mercury has no atmosphere, meaning it has no weather.
 The Earth is a giant magnet.
-Human BodyYour nose and ears never stop growing.
+Your nose and ears never stop growing.
 Human teeth are as strong as shark teeth.
 You lose about 50 to 100 hairs a day.
 The strongest muscle in the body is the tongue.
@@ -77,7 +76,7 @@ Most of the dust in your home is actually dead skin.
 You breathe roughly 20,000 times a day.
 The acid in your stomach is strong enough to dissolve razor blades.
 Your left lung is about 10% smaller than your right lung to make room for your heart.
-History & GeographyRussia has more surface area than Pluto.
+Russia has more surface area than Pluto.
 The Great Wall of China is not visible from the Moon with the naked eye.
 Cleopatra lived closer to the invention of the iPhone than the building of the Great Pyramid.
 There are more historic artifacts under the ocean than in all the world’s museums combined.
@@ -97,4 +96,104 @@ Iceland has no mosquitoes.
 The first iPhone wasn't made by Apple; Linksys had a device named iPhone in 2006.
 A single bolt of lightning contains enough energy to toast 100,000 slices of bread.
 Nintendo was founded in 1889 as a playing card company.
+Trees can "talk" to each other through an underground fungal network.
+A single strand of spaghetti is called a "spaghetto.
+"The fingerprints of koalas are so indistinguishable from humans' that they have been confused at crime scenes.
+Cows have "best friends" and get stressed when they are separated.
+Butterflies can see colors that humans cannot, including ultraviolet.
+A "jiffy" is also the time it takes light to travel one centimeter in a vacuum (33.3564 picoseconds).
+Horses and rats cannot vomit.
+A bolt of lightning is five times hotter than the surface of the sun.
+Every year, the Netherlands sends 20,000 tulip bulbs to Canada to thank them for their help in WWII.
+Male platypuses have venomous spurs on their back ankles.
+Woodpeckers wrap their tongues around their brains to cushion the impact of pecking.
+A hummingbird weighs less than a penny.
+Lobsters aren't biologically immortal, but they don't slow down or get weaker with age.
+There is a species of jellyfish (Turritopsis dohrnii) that is biologically immortal.
+A blue whale's tongue weighs as much as an elephant.
+The "smell" of rain is caused by a bacteria called actinomycetes.
+Prairie dogs greet each other by "kissing."
+Bullfrogs don't sleep.
+Ants don't have lungs; they breathe through tiny holes in their sides.
+A snail's mouth is no larger than the head of a pin, but it can have over 25,000 teeth.
+"Dreamt" is the only English word that ends in the letters "mt."
+The word "alphabet" comes from the first two letters of the Greek alphabet: alpha and beta.
+In Switzerland, it is illegal to own just one guinea pig because they get lonely.
+The hashtag symbol (#) is technically called an "octothorpe."
+"Go" is the shortest complete sentence in the English language.
+The dot over the lower case "i" or "j" is called a "tittle.
+"Shakespeare invented the word "swagger."
+The original name for Bank of America was Bank of Italy.
+A "butt" was a medieval unit of measure for wine (about 126 gallons).
+The word "muscle" comes from a Latin term meaning "little mouse," because Romans thought flexed muscles looked like mice under the skin.
+"Pangram" is a sentence that uses every letter of the alphabet (e.g., "The quick brown fox jumps over the lazy dog").
+The Hawaiian alphabet has only 13 letters.
+There is a word for the act of throwing someone out of a window: "defenestration."
+"E" is the most common letter in the English language.
+The scream used in almost every action movie is called the "Wilhelm Scream."
+More people speak Mandarin Chinese than any other language.
+The phrase "the rule of thumb" originated from a law that allowed a man to beat his wife with a stick no thicker than his thumb (though this is a widely debated myth).
+Scrabble was originally called "Criss-Cross Words.
+"The longest word in the English language has 189,819 letters (it's the chemical name for the protein Titin).
+"Queue" is the only word in the English language that is still pronounced the same way when the last four letters are removed.
+One-quarter of all hazelnuts in the world are used to make Nutella.
+Refined sugar is the only food that has no nutritional value.
+The first oranges weren't orange; they were green.
+Potatoes were the first vegetable grown in space.
+Strawberries aren't berries, but bananas and watermelons are.
+If you boil a beetroot in water and then massage the water into your scalp, it helps get rid of dandruff.
+Honey is the only food that includes all the substances necessary to sustain life, including enzymes, vitamins, minerals, and water.
+In the 1800s, people thought tomatoes were poisonous.
+A cucumber is 96% water.
+There are over 7,500 varieties of apples grown in the world.
+Ranch dressing is the most popular salad dressing in the U.S.
+The inventor of the Pringles can is buried in one.
+Froot Loops are all the same flavor.
+You can hear rhubarb grow; it makes a popping sound during "forced" growth.
+There is no such thing as "baby carrots"—they are just regular carrots shaved down.
+Tonic water glows blue under a blacklight.
+In some parts of the world, ants are eaten as a snack and taste like lemon.
+Chocolate was once used as currency.
+Tea is the most consumed drink in the world after water.
+Crackers have holes in them to prevent air bubbles from ruining them during baking.
+The first alarm clock could only ring at 4 a.m.
+The first computer mouse was made of wood.
+"Bluetooth" was named after a 10th-century Viking king, Harald Bluetooth.
+The QWERTY keyboard was designed to slow down typists so early typewriters wouldn't jam.
+More people have cell phones than toilets.
+The average person unlocks their phone 110 times a day.
+The first domain ever registered was Symbolics.com.
+NASA’s internet speed is 91 gigabits per second.
+CAPTCHA stands for "Completely Automated Public Turing test to tell Computers and Humans Apart."
+The first webcam was created at the University of Cambridge to monitor a coffee pot.
+Every minute, 500 hours of video are uploaded to YouTube.
+Google was originally called "Backrub."
+The "Save" icon in most software is a floppy disk, which most Gen Zers have never used.
+The first text message ever sent said "Merry Christmas."
+The first digital camera was invented by Kodak in 1975, but they suppressed it to protect film sales.
+There are more Lego minifigures than people on Earth.
+The 3.5mm headphone jack is over 100 years old.
+Emojis were invented in Japan in 1999.
+The cloud is actually just someone else's computer.
+An average laptop uses less power than a lightbulb.
+The sunset on Mars appears blue.
+If two pieces of the same type of metal touch in space, they will bond permanently (Cold Welding).
+Earth is the only planet not named after a god.
+There are more lifeforms living on your skin than there are people on the planet.
+The Sahara Desert can actually freeze at night.
+There is a giant cloud of alcohol in outer space.
+The Arctic Ocean is the smallest of the world's oceans.
+Mount Everest isn't the closest point to space; the summit of Mount Chimborazo in Ecuador is.
+Lightning strikes the Earth 100 times every second.
+A day on Jupiter is only 10 hours long.
+If you unraveled your DNA, it would stretch to Pluto and back 17 times.
+The Pacific Ocean is shrinking by about one inch every year.
+Russia has 11 different time zones.
+The Great Barrier Reef is the largest living structure on Earth.
+99% of the Earth's gold is located in its core.
+Saturn could float on water because its density is lower than water's.
+There is a volcano on Mars (Olympus Mons) that is three times the height of Mt. Everest.
+Diamonds are not rare; they are just heavily marketed.
+The ozone layer will fully recover by 2050 if current trends continue.
+Venus is the only planet that rotates clockwise.
 You're going to hell.
