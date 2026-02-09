@@ -100,7 +100,7 @@ def handle_clicks():
     now = datetime.now()
     if click_count == 1:
         # Single click action
-        if now + timedelta(minutes=5) >= last_interaction:
+        if (now - last_interaction) >= timedelta(minutes=5):
             # Announce ready state instead of toggling backwards mode
             set_default_alarm_and_announce_ready()
         else:
