@@ -143,8 +143,8 @@ def set_default_alarm_and_announce_ready():
     print(f"Set alarm time: {alarm_time}", flush=True)
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
 
-subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
-time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
+#subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
+#time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
 print("ready", flush=True)
 set_default_alarm_and_announce_ready()
 # announce the current time on start up, so if the system time is wrong the user knows
@@ -230,5 +230,5 @@ finally:
     if click_timer is not None:
         click_timer.cancel()
     stop_playback()
-    subprocess.run(["bluetoothctl", "disconnect", SPEAKER_MAC])
+    #subprocess.run(["bluetoothctl", "disconnect", SPEAKER_MAC])
     GPIO.cleanup()
