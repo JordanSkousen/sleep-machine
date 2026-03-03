@@ -170,7 +170,7 @@ try:
 
         # --- Morning Announcement Logic ---
         # Generate the morning announcement 1 minute before the alarm goes off, so it can play instantly after the alarm is dismissed.
-        if (not morning_announcement_generated and not alarm_mode and white_noise_playing and (now - timedelta(minutes=1)) >= alarm_time):
+        if (not morning_announcement_generated and not alarm_mode and white_noise_playing and now >= (alarm_time - timedelta(minutes=1))):
             morning_announcement_generated = True
             if os.path.exists(MORNING_FILE):
                 os.remove(MORNING_FILE)

@@ -53,7 +53,6 @@ def get_morning_announcement(personality = pick_random_personality()):
 
     fun_fact = pick_random_funfact()
     forecast_summary = get_weather()
-    #personality = pick_random_personality()
 
     today = datetime.now().strftime("%B %d, %Y")
     name = personality['name']
