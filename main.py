@@ -40,6 +40,7 @@ alarm_mode = False
 backwards_mode = False
 click_timer = None
 click_count = 0
+morning_announcement_generated = False
 alarm_announced = False
 alarm_time = datetime.now()
 last_interaction = datetime.now()
@@ -61,6 +62,7 @@ ALARM_FILE = "alarm.mp3"
 POD_TEMP = -45
 SPEAKER_MAC = "F8:0F:F9:BF:9C:E0"
 LAST_ALARM_FILE = "last_alarm.txt"
+MORNING_FILE = "/tmp/morning.mp3"
 
 def get_last_alarm_time():
     if not os.path.exists(LAST_ALARM_FILE):
@@ -165,6 +167,14 @@ try:
             except:
                 print("Failed to turn on pod", flush=True)
 
+        # --- Morning Announcement Logic ---
+        # Generate the morning announcement 1 minute before the alarm goes off, so it can play instantly after the alarm is dismissed.
+        if (not morning_announcement_generated and not alarm_mode and white_noise_playing and (now - timedelta(minutes=1)) >= alarm_time):
+            morning_announcement_generated = True
+            if os.path.exists(MORNING_FILE):
+                os.remove(MORNING_FILE)
+            generate_morning_announcement(MORNING_FILE)
+
         # --- Alarm Trigger Logic ---
         if (not alarm_mode and white_noise_playing and now >= alarm_time):
             print("Alarm triggered", flush=True)
@@ -181,7 +191,8 @@ try:
                 else:
                     alarm_time += timedelta(minutes=15)
 
-            announcement = f"Alarm set to {alarm_time.strftime("%H:%M")}"
+            alarm_time_str = alarm_time.strftime("%H:%M")
+            announcement = f"Alarm set to {alarm_time_str}"
             announcement_file = f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3"
             threading.Thread(target=play_file, args=(announcement_file,)).start()
 
@@ -194,11 +205,11 @@ try:
                 click_count = 0
                 alarm_mode = False
                 white_noise_playing = False
+                morning_announcement_generated = False
                 print("Stopping alarm", flush=True)
                 stop_playback()
-                morning_file = "/tmp/morning.mp3"
-                if generate_morning_announcement(morning_file):
-                    threading.Thread(target=play_file, args=(morning_file,)).start()
+                if os.path.exists(MORNING_FILE):
+                    threading.Thread(target=play_file, args=(MORNING_FILE,)).start()
                 else:
                     threading.Thread(target=play_file, args=(f"{SOUND_PATH}tts/gmorn.mp3",)).start()
                 try:
