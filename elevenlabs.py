@@ -1,5 +1,3 @@
-import datetime
-import time
 import requests
 import os
 
@@ -8,9 +6,6 @@ import os
 # You can get one from the ElevenLabs website. It is recommended to use an environment variable.
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 # This is the ID for the pre-made 'Rachel' voice. You can find other voice IDs in your Voice Lab.
-VOICE_ID = "CwhRBWXzGAHq8TQ4Fs17"
-
-TTS_URL = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
 
 HEADERS = {
     "Accept": "audio/mpeg",
@@ -18,7 +13,7 @@ HEADERS = {
     "xi-api-key": ELEVENLABS_API_KEY
 }
 
-def tts(text: str, output_filename: str = "output.mp3") -> bool:
+def tts(voice_id: str, text: str, output_filename: str = "output.mp3") -> bool:
     print(f"Converting \"{text}\" to mp3...", flush=True)
 
     data = {
@@ -33,7 +28,7 @@ def tts(text: str, output_filename: str = "output.mp3") -> bool:
     }
 
     try:
-        response = requests.post(TTS_URL, json=data, headers=HEADERS)
+        response = requests.post(f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}", json=data, headers=HEADERS)
 
         if response.status_code == 200:
             # The API returns MP3 audio, so it's better to save it as .mp3

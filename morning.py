@@ -5,6 +5,7 @@ from google.genai import types
 import requests
 from bs4 import BeautifulSoup
 from elevenlabs import tts
+import csv
 
 def get_weather():
     """
@@ -37,7 +38,14 @@ def pick_random_funfact():
     
     return random.choice(lines)
 
-def get_morning_announcement():
+def pick_random_personality():
+    """Read personalities.csv and return a random personality."""
+    with open("personalities.csv", 'r') as f:
+        reader = csv.DictReader(f)
+        personalities = list(reader)
+    return random.choice(personalities)
+
+def get_morning_announcement(personality = pick_random_personality()):
     """
     Generates a morning announcement with weather and a fun fact.
     """
@@ -45,36 +53,39 @@ def get_morning_announcement():
 
     fun_fact = pick_random_funfact()
     forecast_summary = get_weather()
-    if forecast_summary:
-        today = datetime.now().strftime("%B %d, %Y")
-        prompt = f"You are a easy-going, silly weather man reporting today's forecast. Today's forecast is {forecast_summary}. Today's date is {today}. Give the weather report for today, then throw in this fun fact: \"{fun_fact}\". Keep it under 200 words."
+    #personality = pick_random_personality()
 
-        print("Generating morning announcement...", flush=True)
-        try:
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=types.Part.from_text(text=prompt)
-            )
-            # I tried including asking for a fun fact in the gemini prompt, but it kept giving me the same fun fact "A group of owls is called a parliament" lol
-            print("Announcement text generated:", flush=True)
-            print(response.text, flush=True)
-            return response.text
-        except Exception as e:
-            print(f"An error occurred during content generation: {e}", flush=True)
-            return fun_fact
-        finally:
-            client.close()
-    else:
-        return f"Here's a random fun fact: {fun_fact}"
+    today = datetime.now().strftime("%B %d, %Y")
+    name = personality['name']
+    voice_id = personality['voice_id']
+    base_prompt = personality['prompt']
+
+    prompt = f"Your name is {name}. {base_prompt} Today's forecast is {forecast_summary}. Today's date is {today}. Give the weather report for today, then throw in this fun fact: \"{fun_fact}\". Keep it under 200 words."
+
+    print(f"Generating morning announcement with personality: {name}", flush=True)
+    try:
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=types.Part.from_text(text=prompt)
+        )
+        # I tried including asking for a fun fact in the gemini prompt, but it kept giving me the same fun fact "A group of owls is called a parliament" lol
+        print("Announcement text generated:", flush=True)
+        print(response.text, flush=True)
+        return response.text, voice_id
+    except Exception as e:
+        print(f"An error occurred during content generation: {e}", flush=True)
+        return fun_fact, voice_id
+    finally:
+        client.close()
 
 def generate_morning_announcement(output_file):
     """
     Main function to generate and save the morning announcement.
     """
     # You can change the location here
-    announcement = get_morning_announcement()
+    announcement, voice_id = get_morning_announcement()
     if announcement:
-        return tts(announcement, output_filename=output_file)
+        return tts(voice_id=voice_id, text=announcement, output_filename=output_file)
 
 if __name__ == "__main__":
     generate_morning_announcement("morning_announcement.mp3")
