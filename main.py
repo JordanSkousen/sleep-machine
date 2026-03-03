@@ -57,7 +57,7 @@ ALARM_PRESETS = [
     [8, 30], # Sun night (goes off Mon morning)
 ]
 SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
-WHITE_NOISE_FILE = "Aircraft Lavatory medium extended.mp3"
+WHITE_NOISE_FILE = "Aircraft Lavatory extended.mp3"
 ALARM_FILE = "alarm.mp3"
 POD_TEMP = -45
 SPEAKER_MAC = "F8:0F:F9:BF:9C:E0"
@@ -147,6 +147,7 @@ def set_default_alarm_and_announce_ready():
 
 #subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
 #time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
+#subprocess.run(["amixer", "-c", "2", "sset", "'Speaker'", "100%"])
 print("ready", flush=True)
 set_default_alarm_and_announce_ready()
 # announce the current time on start up, so if the system time is wrong the user knows
