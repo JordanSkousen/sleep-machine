@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 from elevenlabs import tts
 import csv
+import os
 
 def get_weather():
     """
@@ -43,12 +44,24 @@ def pick_random_personality():
     with open("personalities.csv", 'r') as f:
         reader = csv.DictReader(f)
         personalities = list(reader)
-    return random.choice(personalities)
+    previous_personalities = []
+    if os.path.exists(".previous_personalities"):
+        with open(".previous_personalities", 'r') as f:
+            previous_personalities = [line.strip() for line in f.readlines() if line.strip()]
+        if len(previous_personalities) == len(personalities):
+            os.remove(".previous_personalities")
+            previous_personalities = [previous_personalities[-1]]
+    personality = random.choice(personalities)
+    while personality['name'] in previous_personalities:
+        personality = random.choice(personalities)
+    return personality
 
 def get_morning_announcement(personality = pick_random_personality()):
     """
     Generates a morning announcement with weather and a fun fact.
     """
+    with open(".previous_personalities", 'a') as f:
+        f.write(personality['name'] + "\n")
     client = genai.Client() # GEMINI_API_KEY environment variable automatically set by Client
 
     fun_fact = pick_random_funfact()
@@ -88,3 +101,5 @@ def generate_morning_announcement(output_file):
 
 if __name__ == "__main__":
     generate_morning_announcement("morning_announcement.mp3")
+    #get_morning_announcement()
+    #print(pick_random_personality())
