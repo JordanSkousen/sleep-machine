@@ -57,10 +57,13 @@ def pick_random_personality():
         personality = random.choice(personalities)
     return personality
 
-def get_morning_announcement(personality = pick_random_personality(), attempt=0):
+def get_morning_announcement(personality=None, attempt=0):
     """
     Generates a morning announcement with weather and a fun fact.
     """
+    if personality is None:
+        personality = pick_random_personality()
+
     with open(".previous_personalities", 'a') as f:
         f.write(personality['name'] + "\n")
     client = genai.Client() # GEMINI_API_KEY environment variable automatically set by Client
