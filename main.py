@@ -97,14 +97,14 @@ def alarm_lock_is_active():
     return True # Lock is active
 
 def handle_clicks():
-    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_ready, play_file, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
+    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_alarm, play_file, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
 
     now = datetime.now()
     if click_count == 1:
         # Single click action
         if (now - last_interaction) >= timedelta(minutes=5):
-            # Announce ready state instead of toggling backwards mode
-            set_default_alarm_and_announce_ready()
+            (# Announce ready state instead of toggling backwards mode
+            set_default_alarm_and_announce_alarm())
         else:
             # Toggle backwards mode
             backwards_mode = not backwards_mode
@@ -119,6 +119,9 @@ def handle_clicks():
             print("Cannot play white noise, alarm has already gone off today.", flush=True)
             threading.Thread(target=play_file, args=(f"{SOUND_PATH}tts/notallowed.mp3",)).start()
         else:
+            if (now - last_interaction) >= timedelta(minutes=5):
+                # Announce ready state instead of changing time
+                set_default_alarm_and_announce_alarm()
             print("Playing white noise", flush=True)
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
@@ -134,9 +137,10 @@ def handle_clicks():
                     print("Failed to turn on pod", flush=True)
 
     click_count = 0
+    last_interaction = now
 
 
-def set_default_alarm_and_announce_ready():
+def set_default_alarm_and_announce_alarm(readyfile = "alarmset"):
     global alarm_time, ALARM_PRESETS
     now = datetime.now()
     dow = (now - timedelta(hours=3)).weekday() # When calculating the day of week, subtract 3 from the current hour so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
@@ -149,7 +153,7 @@ def set_default_alarm_and_announce_ready():
 #time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
 #subprocess.run(["amixer", "-c", "2", "sset", "'Speaker'", "100%"])
 print("ready", flush=True)
-set_default_alarm_and_announce_ready()
+set_default_alarm_and_announce_alarm("ready")
 # announce the current time on start up, so if the system time is wrong the user knows
 play_file_sync(f"{SOUND_PATH}tts/currenttime.mp3")
 play_file_sync(f"{SOUND_PATH}tts/int/{datetime.now().hour}.mp3")
@@ -185,21 +189,24 @@ try:
 
         # --- Potentiometer Logic ---
         if not white_noise_playing and clk_state != clk_last_state and clk_state == 1:
-            last_interaction = now
-            if alarm_time.hour >= 4 and alarm_time.hour <= 12:
-                if backwards_mode:
-                    alarm_time -= timedelta(minutes=15)
-                else:
-                    alarm_time += timedelta(minutes=15)
+            if (now - last_interaction) >= timedelta(minutes=5):
+                # Announce ready state instead of changing time
+                set_default_alarm_and_announce_alarm()
+            else:
+                if alarm_time.hour >= 4 and alarm_time.hour <= 12:
+                    if backwards_mode:
+                        alarm_time -= timedelta(minutes=15)
+                    else:
+                        alarm_time += timedelta(minutes=15)
 
-            alarm_time_str = alarm_time.strftime("%H:%M")
-            announcement = f"Alarm set to {alarm_time_str}"
-            announcement_file = f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3"
-            threading.Thread(target=play_file, args=(announcement_file,)).start()
+                alarm_time_str = alarm_time.strftime("%H:%M")
+                announcement = f"Alarm set to {alarm_time_str}"
+                announcement_file = f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3"
+                threading.Thread(target=play_file, args=(announcement_file,)).start()
+            last_interaction = now
 
         # --- Button Logic ---
         if button_state != button_last_state and button_state == GPIO.LOW:
-            last_interaction = now
             if click_timer:
                 click_timer.cancel()
             if alarm_mode:

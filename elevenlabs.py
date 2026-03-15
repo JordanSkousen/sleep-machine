@@ -5,7 +5,6 @@ import os
 # IMPORTANT: Replace with your actual ElevenLabs API key.
 # You can get one from the ElevenLabs website. It is recommended to use an environment variable.
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
-# This is the ID for the pre-made 'Rachel' voice. You can find other voice IDs in your Voice Lab.
 
 HEADERS = {
     "Accept": "audio/mpeg",
@@ -55,6 +54,6 @@ if __name__ == '__main__':
     #    min = f":{t.minute:02d}" if t.minute != 0 else ""
     #    tts(f"{t.hour}{min} {tod}", f"tts/{t.hour}{t.minute}")
     #    t += datetime.timedelta(minutes=15)
-    for i in range(60):
-        tts(f"{i}", f"tts/int/{i}")
-    tts(f"Current time is:", "tts/currenttime")
+    #for i in range(60):
+    #    tts(f"{i}", f"tts/int/{i}")
+    tts(voice_id="CwhRBWXzGAHq8TQ4Fs17", text=f"Alarm is set for:", output_filename="tts/alarmset")
