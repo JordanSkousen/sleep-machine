@@ -8,3 +8,6 @@ GEMINI_API_KEY
 Aircraft Lavatory extended.mp3
 __pycache__
 cron.log
+stocks.csv
+weather_cities.csv
+.previous_personalities

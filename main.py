@@ -145,7 +145,7 @@ def set_default_alarm_and_announce_alarm(readyfile = "alarmset"):
     now = datetime.now()
     dow = (now - timedelta(hours=3)).weekday() # When calculating the day of week, subtract 3 from the current hour so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
     alarm_time = now.replace(hour=ALARM_PRESETS[dow][0], minute=ALARM_PRESETS[dow][1], second=0, microsecond=0)
-    play_file_sync(f"{SOUND_PATH}tts/ready.mp3")
+    play_file_sync(f"{SOUND_PATH}tts/{readyfile}.mp3")
     print(f"Set alarm time: {alarm_time}", flush=True)
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
 
