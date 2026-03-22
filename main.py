@@ -6,6 +6,7 @@ import threading
 import os
 from eightsleep import EightSleep
 from morning import generate_morning_announcement
+from utils import get_wifi_config
 
 cvlc_process = None
 def play_file(file, repeat=False):
@@ -63,6 +64,15 @@ POD_TEMP = -45
 SPEAKER_MAC = "F8:0F:F9:BF:9C:E0"
 LAST_ALARM_FILE = "last_alarm.txt"
 MORNING_FILE = "/tmp/morning.mp3"
+
+def set_timezone():
+    """
+    Sets the system timezone based on the currently connected wifi network SSID,
+    which is controlled using wifi_networks.csv.
+    """
+    city = get_wifi_config()
+    if city is not None:
+        subprocess.run(["timedatectl", "set-timezone", city['timezone']])
 
 def get_last_alarm_time():
     if not os.path.exists(LAST_ALARM_FILE):

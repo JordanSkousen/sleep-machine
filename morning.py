@@ -8,46 +8,20 @@ from elevenlabs import tts
 import csv
 import os
 import time
-import subprocess
-
-def get_wifi_ssid():
-    """Gets the SSID of the currently connected Wi-Fi network (Linux/Debian)."""
-    try:
-        # Try iwgetid first (common on Debian/Raspberry Pi)
-        ssid = subprocess.check_output(['iwgetid', '-r'], stderr=subprocess.DEVNULL).decode('utf-8').strip()
-        if ssid:
-            return ssid
-    except Exception:
-        pass
-
-    try:
-        # Try nmcli as a fallback (NetworkManager)
-        output = subprocess.check_output(['nmcli', '-t', '-f', 'active,ssid', 'dev', 'wifi'], stderr=subprocess.DEVNULL).decode('utf-8')
-        for line in output.split('\n'):
-            if line.startswith('yes:'):
-                return line.split(':', 1)[1].strip()
-    except Exception:
-        pass
-
-    return None
+from utils import get_wifi_config
 
 def get_weather():
     """
     Fetches weather from wunderground.com. The location is based on the currently connected wifi network SSID,
-    which is controlled using weather_cities.csv.
+    which is controlled using wifi_networks.csv.
     - Columns expected:
         - ssid (e.g. "NETGEAR420")
         - state (e.g. "CA")
         - city (e.g. "Death Valley")
     """
-    ssid = get_wifi_ssid()
-    if ssid is None:
+    city = get_wifi_config()
+    if city is None:
         return None, None
-    
-    with open("weather_cities.csv", 'r') as f:
-        reader = csv.DictReader(f)
-        cities = list(reader)
-    city = [city for city in cities if city['ssid'] == ssid][0]
     place_name = f"{city['city']}, {city['state']}"
     print(f"Getting weather from Wunderground for '{place_name}'...", flush=True)
     try:
