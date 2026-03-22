@@ -46,6 +46,7 @@ alarm_announced = False
 alarm_time = datetime.now()
 last_interaction = datetime.now()
 eight_sleep = EightSleep()
+wifi_config = get_wifi_config()
 
 # --- Configuration ---
 ALARM_PRESETS = [
@@ -64,6 +65,7 @@ POD_TEMP = -45
 SPEAKER_MAC = "F8:0F:F9:BF:9C:E0"
 LAST_ALARM_FILE = "last_alarm.txt"
 MORNING_FILE = "/tmp/morning.mp3"
+CONTROL_EIGHT_SLEEP = wifi_config['control_eightsleep'] == 'True' if wifi_config is not None else True
 
 def set_timezone():
     """
@@ -107,7 +109,7 @@ def alarm_lock_is_active():
     return True # Lock is active
 
 def handle_clicks():
-    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_alarm, play_file, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP
+    global click_count, white_noise_playing, alarm_time, backwards_mode, eight_sleep, last_interaction, set_default_alarm_and_announce_alarm, play_file, SOUND_PATH, WHITE_NOISE_FILE, POD_TEMP, CONTROL_EIGHT_SLEEP
 
     now = datetime.now()
     if click_count == 1:
@@ -139,7 +141,7 @@ def handle_clicks():
             #alarm_time = alarm_time.replace(day=now.day, hour=now.hour, minute=now.minute + 1) # For debugging
             if alarm_time < now: # if current time is before midnight, the alarm time will be in the past -- move alarm time to tomorrow
                 alarm_time = alarm_time + timedelta(days=1)
-            if not eight_sleep.is_pod_on:
+            if CONTROL_EIGHT_SLEEP and not eight_sleep.is_pod_on:
                 try:
                     eight_sleep.set_pod_state(True)
                     eight_sleep.set_temperature(POD_TEMP)
@@ -176,7 +178,7 @@ try:
         button_state = GPIO.input(SW_PIN)
         now = datetime.now()
 
-        if not eight_sleep.is_pod_on and now.hour >= 11:
+        if CONTROL_EIGHT_SLEEP and not eight_sleep.is_pod_on and now.hour >= 11:
             try:
                 eight_sleep.set_pod_state(True)
                 eight_sleep.set_temperature(POD_TEMP)
@@ -231,20 +233,22 @@ try:
                     threading.Thread(target=play_file, args=(MORNING_FILE,)).start()
                 else:
                     threading.Thread(target=play_file, args=(f"{SOUND_PATH}tts/gmorn.mp3",)).start()
-                try:
-                    eight_sleep.set_pod_state(False)
-                except:
-                    print("Failed to turn off pod", flush=True)
+                if CONTROL_EIGHT_SLEEP:
+                    try:
+                        eight_sleep.set_pod_state(False)
+                    except:
+                        print("Failed to turn off pod", flush=True)
 
             elif white_noise_playing:
                 click_count = 0
                 print("Stopping white noise", flush=True)
                 stop_playback()
                 white_noise_playing = False
-                try:
-                    eight_sleep.set_pod_state(False)
-                except:
-                    print("Failed to turn off pod", flush=True)
+                if CONTROL_EIGHT_SLEEP:
+                    try:
+                        eight_sleep.set_pod_state(False)
+                    except:
+                        print("Failed to turn off pod", flush=True)
             else:
                 click_count += 1
                 click_timer = threading.Timer(0.3, handle_clicks)
