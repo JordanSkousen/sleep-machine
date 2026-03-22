@@ -45,7 +45,6 @@ morning_announcement_generated = False
 alarm_announced = False
 alarm_time = datetime.now()
 last_interaction = datetime.now()
-eight_sleep = EightSleep()
 wifi_config = get_wifi_config()
 
 # --- Configuration ---
@@ -67,6 +66,8 @@ LAST_ALARM_FILE = "last_alarm.txt"
 MORNING_FILE = "/tmp/morning.mp3"
 CONTROL_EIGHT_SLEEP = wifi_config['control_eightsleep'] == 'True' if wifi_config is not None else True
 
+eight_sleep = EightSleep() if CONTROL_EIGHT_SLEEP else None
+
 def set_timezone():
     """
     Sets the system timezone based on the currently connected wifi network SSID,
@@ -74,7 +75,7 @@ def set_timezone():
     """
     city = get_wifi_config()
     if city is not None:
-        subprocess.run(["timedatectl", "set-timezone", city['timezone']])
+        subprocess.run(["sudo", "timedatectl", "set-timezone", city['timezone']])
 
 def get_last_alarm_time():
     if not os.path.exists(LAST_ALARM_FILE):
