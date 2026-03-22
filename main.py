@@ -149,7 +149,7 @@ def set_default_alarm_and_announce_alarm(readyfile = "alarmset"):
     print(f"Set alarm time: {alarm_time}", flush=True)
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
 
-#subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
+subprocess.run(["bluetoothctl", "connect", SPEAKER_MAC])
 #time.sleep(2) # wait a few secs b/c bluetooth is glitchy for first few secs after connecting
 #subprocess.run(["amixer", "-c", "2", "sset", "'Speaker'", "100%"])
 print("ready", flush=True)
