@@ -52,37 +52,31 @@ def get_stock_prices():
         - ticker (e.g. "APPL")
         - name (e.g. "Apple Inc.")
         - shares (e.g. 420)
-        - price (e.g. 69.69)
-    - Each row should be a holding in a stock. You can have duplicate rows with the same ticker, for example 
-      if you bought the same stock multiple times."""
+        - purchase_price (how much you've put in, e.g. 666.69)
+    - Each row should be a holding in a stock."""
     with open("stocks.csv", 'r') as f:
         reader = csv.DictReader(f)
         stocks = list(reader)
-    tickers = set(x['ticker'] for x in stocks)
     values = []
-    for ticker in tickers:
+    for stock in stocks:
         try:
+            ticker = stock['ticker']
             print(f"Getting stock price for ticker '{ticker}'...")
-            #response.raise_for_status()
-            #soup = BeautifulSoup(response.text, 'html.parser')
-            #name_el = soup.select_one("section > h1")
-            #price_el = soup.select_one(".price.yf-1ommk34.base:not(.up2)")
             response = requests.get(f"https://api.nasdaq.com/api/quote/{ticker}/info?assetclass=stocks", headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36'})
             response.raise_for_status()
             response_json = response.json()
 
             if response_json and response_json['data'] and response_json['data']['primaryData'] and response_json['data']['primaryData']['lastSalePrice']:
                 current_price = float(response_json['data']['primaryData']['lastSalePrice'].replace("$", ""))
-                applicable_stocks = [stock for stock in stocks if stock['ticker'] == ticker]
-                amount_paid = sum(float(stock['shares']) * float(stock['price']) for stock in applicable_stocks)
-                amount_holding = sum(float(stock['shares']) * current_price for stock in applicable_stocks)
+                purchase_price = float(stock['purchase_price'])
+                amount_holding = float(stock['shares']) * current_price
                 values.append({
                     'ticker': ticker,
-                    'name': applicable_stocks[0]['name'],
+                    'name': stock['name'],
                     'current_price': current_price,
                     'change': f"{response_json['data']['primaryData']['deltaIndicator']} {response_json['data']['primaryData']['percentageChange'].replace('-', '')}",
-                    'holding_delta': amount_holding - amount_paid,
-                    'holding_pct': (amount_holding - amount_paid) / amount_paid,
+                    'holding_delta': amount_holding - purchase_price,
+                    'holding_pct': (amount_holding - purchase_price) / purchase_price,
                 })
             else:
                 print(f"Couldn't find current price for stock {ticker}.")
@@ -182,5 +176,5 @@ if __name__ == "__main__":
     #generate_morning_announcement("morning_announcement.mp3")
     #get_morning_announcement()
     #print(pick_random_personality())
-    #print(get_stock_prices())
-    print(get_weather())
+    print(get_stock_prices())
+    #print(get_weather())
