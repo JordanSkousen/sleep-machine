@@ -135,11 +135,11 @@ def handle_clicks():
             if (now - last_interaction) >= timedelta(minutes=5):
                 # Announce ready state instead of changing time
                 set_default_alarm_and_announce_alarm()
-            print("Playing white noise", flush=True)
+            print(f"Playing white noise, set alarm time is: {alarm_time}", flush=True)
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
             backwards_mode = False
-            #alarm_time = alarm_time.replace(day=now.day, hour=now.hour, minute=now.minute + 1) # For debugging
+            alarm_time = alarm_time.replace(day=now.day, hour=now.hour, minute=now.minute + 1) # For debugging
             if alarm_time < now: # if current time is before midnight, the alarm time will be in the past -- move alarm time to tomorrow
                 alarm_time = alarm_time + timedelta(days=1)
             if CONTROL_EIGHT_SLEEP and not eight_sleep.is_pod_on:
@@ -158,6 +158,8 @@ def set_default_alarm_and_announce_alarm(readyfile = "alarmset"):
     now = datetime.now()
     dow = (now - timedelta(hours=3)).weekday() # When calculating the day of week, subtract 3 from the current hour so that on Sun from 12:00am-3:00am it chooses the Sat time to wake up (10:00am)
     alarm_time = now.replace(hour=ALARM_PRESETS[dow][0], minute=ALARM_PRESETS[dow][1], second=0, microsecond=0)
+    if alarm_time < now: # if current time is before midnight, the alarm time will be in the past -- move alarm time to tomorrow
+        alarm_time = alarm_time + timedelta(days=1)
     play_file_sync(f"{SOUND_PATH}tts/{readyfile}.mp3")
     print(f"Set alarm time: {alarm_time}", flush=True)
     play_file_sync(f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3")
@@ -192,7 +194,7 @@ try:
             morning_announcement_generated = True
             if os.path.exists(MORNING_FILE):
                 os.remove(MORNING_FILE)
-            generate_morning_announcement(MORNING_FILE)
+            threading.Thread(target=generate_morning_announcement, args=(MORNING_FILE,)).start() # generate announcement asynchronously, so if something gets stuck the alarm doesn't fail to be triggered
 
         # --- Alarm Trigger Logic ---
         if (not alarm_mode and white_noise_playing and now >= alarm_time):
@@ -215,6 +217,7 @@ try:
 
                 alarm_time_str = alarm_time.strftime("%H:%M")
                 announcement = f"Alarm set to {alarm_time_str}"
+                print(announcement, flush=True)
                 announcement_file = f"{SOUND_PATH}tts/{alarm_time.hour}{alarm_time.minute}.mp3"
                 threading.Thread(target=play_file, args=(announcement_file,)).start()
             last_interaction = now

@@ -125,8 +125,8 @@ def get_morning_announcement(personality=None):
 
     with open(".previous_personalities", 'a') as f:
         f.write(personality['name'] + "\n")
-    client = genai.Client() # GEMINI_API_KEY environment variable automatically set by Client
 
+    # I tried including asking for a fun fact in the gemini prompt, but it kept giving me the same fun fact "A group of owls is called a parliament" lol
     fun_fact = pick_random_funfact()
     place_name, forecast_summary = get_weather()
     stock_summaries = " ".join(get_stock_summaries())
@@ -141,14 +141,15 @@ def get_morning_announcement(personality=None):
         f"Your name is {name}. {base_prompt} Unfortunately you were unable to determine today's forecast before getting on. Create an excuse as to why you are unprepared. {stock_summaries_str} Finally, make sure to throw in this fun fact: \"{fun_fact}\". Keep it under 200 words."
 
     print(f"Generating morning announcement with personality: {name}", flush=True)
+    attempt = 0
+    client = genai.Client() # GEMINI_API_KEY environment variable automatically set by Client
     while True:
-        attempt = 0
         try:
             response = client.models.generate_content(
-                model='gemini-2.5-flash',
+                model='gemini-3-flash-preview',
                 contents=types.Part.from_text(text=prompt)
             )
-            # I tried including asking for a fun fact in the gemini prompt, but it kept giving me the same fun fact "A group of owls is called a parliament" lol
+            client.close()
             print("Announcement text generated:", flush=True)
             print(response.text, flush=True)
             return response.text, voice_id
@@ -157,11 +158,10 @@ def get_morning_announcement(personality=None):
             if attempt < 3:
                 print(f"Trying to generate morning announcement again (attempt {attempt + 1}/3)...")
                 attempt = attempt + 1
-                time.sleep(2)
+                time.sleep(5)
             else: 
+                client.close()
                 return fun_fact, voice_id
-        finally:
-            client.close()
 
 def generate_morning_announcement(output_file):
     """
@@ -173,8 +173,8 @@ def generate_morning_announcement(output_file):
         return tts(voice_id=voice_id, text=announcement, output_filename=output_file)
 
 if __name__ == "__main__":
-    #generate_morning_announcement("morning_announcement.mp3")
+    generate_morning_announcement("morning_announcement.mp3")
     #get_morning_announcement()
     #print(pick_random_personality())
-    print(get_stock_prices())
+    #print(get_stock_prices())
     #print(get_weather())
