@@ -139,7 +139,7 @@ def handle_clicks():
             play_file(f"{SOUND_PATH}{WHITE_NOISE_FILE}", repeat=True)
             white_noise_playing = True
             backwards_mode = False
-            alarm_time = alarm_time.replace(day=now.day, hour=now.hour, minute=now.minute + 1) # For debugging
+            #alarm_time = alarm_time.replace(day=now.day, hour=now.hour, minute=now.minute + 1) # For debugging
             if alarm_time < now: # if current time is before midnight, the alarm time will be in the past -- move alarm time to tomorrow
                 alarm_time = alarm_time + timedelta(days=1)
             if CONTROL_EIGHT_SLEEP and not eight_sleep.is_pod_on:
