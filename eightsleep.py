@@ -14,6 +14,7 @@ class EightSleep:
         """
         self.username = os.getenv("EIGHTSLEEP_USERNAME")
         self.password = os.getenv("EIGHTSLEEP_PASSWORD")
+        self.disabled = False
         
         if not self.username or not self.password:
             raise ValueError("EIGHTSLEEP_USERNAME and EIGHTSLEEP_PASSWORD environment variables must be set.")
@@ -22,10 +23,11 @@ class EightSleep:
         try:
             self._login()
             self.user_id = self._get_user_id()
+            print("Logged into Eight Sleep successfully.", flush=True)
         except:
             print("Failed to login to Eight Sleep", flush=True)
+            self.disabled = True
         self.is_pod_on = False
-        print("Eight Sleep client initialized successfully.", flush=True)
 
     def _get_headers(self) -> dict:
         """
@@ -101,21 +103,25 @@ class EightSleep:
         """
         Sends a command to turn on the pod.
         """
-        print("Sending command to turn ON the pod..." if on else "Sending command to turn OFF the pod...", flush=True)
-        self._check_login_needed()
-        url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
-        headers = self._get_headers()
-        
-        response = requests.put(url, headers=headers, json={
-            "currentState": {
-                "type": "smart" if on else "off"
-            }
-        })
-        response.raise_for_status()
-        
-        self.is_pod_on = on
-        print("Pod 'turn on' command sent successfully." if on else "Pod 'turn off' command sent successfully.", flush=True)
-        return response.json()
+        try:
+            print("Sending command to turn ON the pod..." if on else "Sending command to turn OFF the pod...", flush=True)
+            self._check_login_needed()
+            url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
+            headers = self._get_headers()
+            
+            response = requests.put(url, headers=headers, json={
+                "currentState": {
+                    "type": "smart" if on else "off"
+                }
+            })
+            response.raise_for_status()
+            
+            self.is_pod_on = on
+            print("Pod 'turn on' command sent successfully." if on else "Pod 'turn off' command sent successfully.", flush=True)
+            return response.json()
+        except:
+            print("Failed to turn on pod")
+            self.disabled = True
 
     def set_temperature(self, level: int = 0):
         """
@@ -124,18 +130,22 @@ class EightSleep:
         Args:
             level (int): The temperature level for the pod (-100 to 100).
         """
-        print(f"Sending command to set temperature to {level}...", flush=True)
-        self._check_login_needed()
-        url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
-        headers = self._get_headers()
+        try:
+            print(f"Sending command to set temperature to {level}...", flush=True)
+            self._check_login_needed()
+            url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
+            headers = self._get_headers()
 
-        response = requests.put(url, headers=headers, json={
-            "currentLevel": level
-        })
-        response.raise_for_status()
-        
-        print("Pod temperature set successfully.", flush=True)
-        return response.json()
+            response = requests.put(url, headers=headers, json={
+                "currentLevel": level
+            })
+            response.raise_for_status()
+            
+            print("Pod temperature set successfully.", flush=True)
+            return response.json()
+        except:
+            print("Failed to set temperature")
+            self.disabled = False
 
 
 if __name__ == '__main__':
