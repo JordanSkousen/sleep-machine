@@ -104,6 +104,8 @@ class EightSleep:
         Sends a command to turn on the pod.
         """
         try:
+            if self.disabled:
+                return None
             print("Sending command to turn ON the pod..." if on else "Sending command to turn OFF the pod...", flush=True)
             self._check_login_needed()
             url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
@@ -131,6 +133,8 @@ class EightSleep:
             level (int): The temperature level for the pod (-100 to 100).
         """
         try:
+            if self.disabled:
+                return None
             print(f"Sending command to set temperature to {level}...", flush=True)
             self._check_login_needed()
             url = f"https://app-api.8slp.net/v1/users/{self.user_id}/temperature/pod?ignoreDeviceErrors=false"
@@ -145,7 +149,7 @@ class EightSleep:
             return response.json()
         except:
             print("Failed to set temperature")
-            self.disabled = False
+            self.disabled = True
 
 
 if __name__ == '__main__':
