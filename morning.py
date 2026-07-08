@@ -54,6 +54,8 @@ def get_stock_prices():
         - shares (e.g. 420)
         - purchase_price (how much you've put in, e.g. 666.69)
     - Each row should be a holding in a stock."""
+    if not os.path.exists("stocks.csv"):
+        return []
     with open("stocks.csv", 'r') as f:
         reader = csv.DictReader(f)
         stocks = list(reader)
