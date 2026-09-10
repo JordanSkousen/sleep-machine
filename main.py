@@ -49,13 +49,13 @@ wifi_config = get_wifi_config()
 
 # --- Configuration ---
 ALARM_PRESETS = [
-    [8, 30], # Mon night (goes off Tue morning)
-    [8, 30], # Tue night (goes off Wed morning)
-    [8, 30], # Wed night (goes off Thu morning)
-    [8, 30], # Thu night (goes off Fri morning)
-    [10, 0], # Fri night (goes off Sat morning)
-    [10, 0], # Sat night (goes off Sun morning)
-    [8, 30], # Sun night (goes off Mon morning)
+    [8, 0], # Mon night (goes off Tue morning)
+    [8, 0], # Tue night (goes off Wed morning)
+    [8, 0], # Wed night (goes off Thu morning)
+    [8, 0], # Thu night (goes off Fri morning)
+    [9, 30], # Fri night (goes off Sat morning)
+    [9, 30], # Sat night (goes off Sun morning)
+    [8, 0], # Sun night (goes off Mon morning)
 ]
 SOUND_PATH = "/home/jordan/source/repos/sleep-machine/"
 WHITE_NOISE_FILE = "Aircraft Lavatory extended.mp3"
