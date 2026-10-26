@@ -33,7 +33,7 @@ def get_weather():
         
         # Using CSS selector to find the forecast summary
         # The query is div.columns.small-12 > a.module-link
-        forecast_element = soup.select_one('div.columns.small-12 > a.module-link')
+        forecast_element = soup.select_one('forecast-box-view .description')
         
         if forecast_element:
             forecast_summary = forecast_element.get_text(strip=True)
